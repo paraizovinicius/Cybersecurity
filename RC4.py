@@ -32,5 +32,5 @@ key = '12345678' # used as an entrance to KSA, witch generates an initial permut
 plaintext = 'Hello, world!'
 print(plaintext)
 ciphertext = rc4(key, plaintext)
-print('Texto criptografado:', ciphertext)
+print('Cipher text:', ciphertext)
 
