@@ -1,9 +1,9 @@
-def rc4(key, plaintext):
+def encrypt(key, plaintext):
     S = list(range(256))
     j = 0
-    saida = []
-    
-    # Converts the key to a list of integers
+    out = []
+
+    # Converte a chave em uma lista de inteiros
     key = [ord(c) for c in key]
 
     # Key-Scheduling Algorithm (KSA)
@@ -17,20 +17,41 @@ def rc4(key, plaintext):
         i = (i + 1) % 256
         j = (j + S[i]) % 256
         S[i], S[j] = S[j], S[i]
-        # chr() converts an int in its equivalent ASCII
-        # ord() converts a character ASCII in its numeric equivalent
-        saida.append(chr(ord(char) ^ S[(S[i] + S[j]) % 256])) 
-        
-    # join() concatenates the elements in a list in a single string
-    # In here, the use of a void string as a separator determines that there won't be a any char added between the elements of the resulting string
-    # In addition, join() expects a list of strings, but saida contains a list of characters, so `str(c) for c in saida` is needed
-    return ''.join(str(c) for c in saida) 
+        out.append(chr(ord(char) ^ S[(S[i] + S[j]) % 256]))
+
+    return ''.join([str(c) for c in out])
 
 
+def decrypt(key, ciphertext):
+    S = list(range(256))
+    j = 0
+    out = []
 
-key = '12345678' # used as an entrance to KSA, witch generates an initial permutation of array S
+    # Converte a chave em uma lista de inteiros
+    key = [ord(c) for c in key]
+
+    # Key-Scheduling Algorithm (KSA)
+    for i in range(256):
+        j = (j + S[i] + key[i % len(key)]) % 256
+        S[i], S[j] = S[j], S[i]
+
+    # Pseudo-Random Generation Algorithm (PRGA)
+    i = j = 0
+    for char in ciphertext:
+        i = (i + 1) % 256
+        j = (j + S[i]) % 256
+        S[i], S[j] = S[j], S[i]
+        out.append(chr(ord(char) ^ S[(S[i] + S[j]) % 256]))
+
+    return ''.join(str(c) for c in out)
+
+# used as an entrance to KSA, witch generates an initial permutation of array S
+key = '20202021'
+iv = "123456"  # Grants that the same key won't generate the same stream of cryptographed bits every time is used
 plaintext = 'Hello, world!'
-print(plaintext)
-ciphertext = rc4(key, plaintext)
+
+ciphertext = encrypt(key, plaintext)
 print('Cipher text:', ciphertext)
 
+decrypted = decrypt(key, ciphertext)
+print('Recovered plaintext: ', decrypted)
